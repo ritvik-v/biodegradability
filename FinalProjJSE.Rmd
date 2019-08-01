@@ -1,0 +1,445 @@
+---
+title: 'YOUR COMPANY NAME:  Predicting Biodegradability'
+output:
+  html_document:
+    df_print: paged
+    header-includes: \usepackage{color}
+    toc: yes
+  html_notebook:
+    theme: united
+    toc: yes
+  pdf_document:
+    toc: yes
+---
+
+# Report Background
+
+This report was prepared for **ChemsRUs** by *your company name.*
+
+This notebook is by *YOUR NAME HERE*
+
+The consultants in our company are: 
+
+   + Name 1
+   + Name 2
+   + Name 3
+   + Name 4
+   + Name 5
+   
+This report embeds all of the R code necessary to produce the results described in this report.
+
+*NOTE: THIS IS A TEMPLATE FOR THE REPORT WITH INSTRUCTIONS FROM ASSIGNMENTS INCLUDED FOR YOUR CONVENIENCE. **DELETE THE INSTRUCTIONS GIVEN IN ITALICS IN YOUR FINAL REPORT NOTEBOOK.** THE NOTEBOOK SHOULD BE AS YOU WOULD GIVE CHEMS-R-US. CODE FRAGMENTS ARE PROVIDED.  YOU CAN ADD OR DELETE R CODE BLOCKS AS NECESSARY.  THERE IS SOME SAMPLE CODE AT THE END OF THIS NOTEBOOK. IT SHOULD BE REMOVED BEFORE SUBMISSION. *
+
+```{r, include=FALSE, set.seed(300)}
+knitr::opts_chunk$set(cache = T)
+
+# These will install required packages if they are not already installed
+if (!require("ggplot2")) {
+   install.packages("ggplot2", dependencies = TRUE)
+   library(ggplot2)
+}
+if (!require("knitr")) {
+   install.packages("knitr", dependencies = TRUE)
+   library(knitr)
+}
+if (!require("xtable")) {
+   install.packages("xtable", dependencies = TRUE)
+   library(xtable)
+}
+if (!require("pander")) {
+   install.packages("pander", dependencies = TRUE)
+   library(pander)
+}
+
+if (!require("devtools")) {
+  install.packages("devtools",dependencies = TRUE ) 
+  library(devtools)
+}
+
+if (!require("usethis")) {
+  install.packages("usethis" ) 
+  library(usethis)
+}
+
+#if (!require("e1071")) {
+#  install.packages("e1071" ) 
+#  library(e1071)
+#}
+
+if (!require("ggbiplot")) {
+  install_git("git://github.com/vqv/ggbiplot.git",dependencies = TRUE)
+  library("ggbiplot")
+}
+if (!require(reshape2)){
+  install.packages("reshape2", dependencies = TRUE)
+   library(reshape2)
+} 
+if (!require(gridExtra)){
+  install.packages("gridExtra", dependencies = TRUE)
+   library(gridExtra)
+} 
+if (!require(MASS)){
+  install.packages("MASS", dependencies = TRUE)
+   library(MASS)
+} 
+
+if (!require(pROC)){
+  install.packages("pROC")
+   library(pROC)
+} 
+if (!require(caret)){
+  install.packages("caret")
+   library(caret)
+} 
+
+if (!require("glmnet")) {
+   install.packages("glmnet", dependencies = TRUE)
+   library(glmnet)
+}
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+# Introduction
+
+*Provide an overview of your report*
+
+# Data Description:
+
+*Provide a basic description of the data.  Describe the size of all the different data sets  (number of attributes, number of points in each class). Do some preliminary data exploration. Provide some sort of summary of the data and describe/show why scaling is a good idea for this data set.   Make a PCA plot colored by class for the data before and after scaling.  Describe the data preparation. Describe why you did the data preparation*
+
+*The data preparation should include:*
+
+   + Read in the external train and external test datasets. 
+   + Scale the training data   to have mean 0 and  standard deviations 1.     
+   + Scale the test data by subtracting subtract the training mean and scaling by the training standard deviations. 
+   + Divide the external training set into an internal train and internal test set using an 80% and 20% split.
+
+*From now on,  references to train and test data refer to the scaled training and test data.*
+
+Handy HINTS:  The following code scales data in matrix `tr` and then applies the same scaling to matrix `tst`. 
+   	
+```{r}
+# sc_tr <- scale(tr,center = TRUE, scale = TRUE)   # scale tr
+# means <- attr(sc_tr, 'scaled:center') # get the mean of the columns
+# stdevs <- attr(sc_tr, 'scaled:scale') # get the std of the columns
+# sc_tst <- scale(tst, center=means, scale=stdevs)#scale tst using the means and std of tr
+```
+
+
+# Baseline Results:
+ 
+*Investigation of alternative models using all the features.  ChemsRUs has asked you to evaluate how LDA and logistic regression performs on this problem using all the features. Divide the training data into 80% train and 20% test splits. Set seed(20) before you split so you entire team uses the same train and test splits.  Train LDA and logistic regression on the training data and evaluate how well it does on the training data.  Compute the balanced accuracy and the AUC for the train and test results.   Compare the results. * 
+
+
+# Feature Selection Results
+
+*Create an approach for selecting the relevant features.  Each team member should come up with their own approach. Describe your approach. Describe the features that you selected.   Create a PCA biplot comparing the two classes.    Create  a classifier  using LDA and logistic regression using these features.    Evaluate how they perform on the training and sets in terms of balanced accuracy and AUC. Compare your results.  Discuss your findings.*
+
+
+
+ 
+ 
+# Challenge Prediction
+
+My challenge ID is .... with an AUC score of ..... for prediction and .... for feature selection.
+
+*Pick your best shot classification  and feature selection methods and then enter the contest.   Provide your scores in the text.  Discuss  your results and the strengths and weaknesses of the different approaches. There should be a separate entry for each participant.  Make sure that between all of your teams entries three different classification methods are used and three different feature selection methods are used.  Using PCA with another method counds as a different classification method* 
+
+The contest can be found here: 
+
+<!-- https://competitions.codalab.org/competitions/21678?secret_key=c29154f0-213e-43ea-8e01-4eef00f9d123 -->
+
+https://competitions.codalab.org/competitions/22460
+
+Provide a csv file with your predictions of the biodegradibility of each data point in `chems_test.csv`. Chems-R-Us will use this to independently verify the quality of your results.   These predictions should be given as a csv files with on column containing the prediction (`1` or `-1`) for each points in chemstest.csv.  Provide a csv file with your prediction of which features are real. The feature predictions should be given  as a csv files with on column containing the prediction (`1` or `0`) indicating if each of the 168 features should be included.  
+Create the files:
+
+- `classification.csv`: Test target values (437 lines x 1 column)
+- `selection.csv`: Solution indicating which variables are real and which are fake (168 lines x 1 column)
+
+Your submission must be a zip archive containing the following files:
+- `classification.csv`, your predicted labels for test dataset. It should include plus or minus one values, one for each test sample, representing the class label predictions.
+- `selection.csv`, representing the features you selected as real or fake (ie `0` or `1`).
+
+https://competitions.codalab.org/competitions/22460
+
+**HINT:** The following R code can be used to generate a zip archive from the two files: 
+```{r}
+# Writing output to submit to contest
+# Make a prediction of all class -1. You will need to replace this with your prediction
+# NOTE: nrow needs to be the length of the test set!!!
+ypred<-matrix(-1,nrow=437,437,ncol=1)
+
+#default is to predict all features
+featurepred<-matrix(1,nrow=168,168,ncol=1)
+
+# Here is a sample file for submission to the website
+write.table(ypred,file = "classification.csv", row.names=F, col.names=F)
+write.table(featurepred,file = "selection.csv", row.names=F, col.names=F)
+system("zip my_test.csv.zip classification.csv selection.csv")
+
+```
+
+# Comparison of Methods 
+
+*Create a **table** comparing the results between your group members on the contest data as reported on the leader board.  Create an ROC curve plot of the test classification results that includes all of the methods in one plot.  Include a table made by creating a data frame that summarizes the results of each team member and then nicely printing it with the `kable()` function; **Do not include a screen shot of "raw" R output!! in your presentations**   Include the number of team member, the number of features used,  training set AUC, internal testing  set AUC, classification AUC from challenge, and  feature selection AUC challenges.     Discuss which method performed best for feature selection, and which method worked best for prediction. What method would you recommend overall? Why?*
+
+# Additional Analysis 
+
+*Provide additional analysis and/or visualizations that may be insightful to Chems-R-Us. Use some method in R not covered by prior labs. Use your imagination, extra credit for creativity here!  Discuss the insights your analysis provides. **Each team member should provide their own analysis/visualization and discussion.** Be sure to title any figures!  Comment your code so all can understand what you are doing. Feel free to use any R code from class or from the web.*
+
+
+# Conclusion
+
+*Provide a conclusion which summarizes your results briefly and adds any observations/suggestions that you have for Chems-R-Us about the data, model, or future work.*
+
+# Notebook Grading Rubrics [REMOVE FROM FINAL NOTEBOOK]
+
+The project will be graded using the following rubric.
+
+  + (10 pts) Did  the data description described both test and train? Did it explain data preparation. 
+  + (10 pts) Was the PCA analysis  properly done and discussed?
+  + (10 pts) Were the baseline results properly done, presented, and discussed? 
+  + (10 pts) Was the procedure for feature selection  well thought-out, presented, described, and executed?
+  + (10 pts) Was the procedure for constructing the final challenge predictive model well thought-out, described, and executed?
+  + (10 pts) Did the individual enter the contest sucessfully and report their result. Were the results discussed?
+  + (15 pts) Was the table comparing the groups results created. Was the ROC curve comparing the classification predictions of the groups results provided. Were the results well analyzed and discussed?   Did the groups results include at least three different feature selection methods and three different prediction methods? Were the strengths and weaknesses of the the different approaches discussed?
+  + (10 pts) Were the additional visualizations and analysis effective?  Was a method not covered in class included?  Were the results discussed?This grade will be an individual grade. 
+  + (10 pts) Was the procedure for the feature challenge well thought out and successfully done. 
+  + (5 pts) Was a conclusion provided that included a summary of primary findings and discussion of future work?
+  + (10 pts) What is the grammatical quality and clarity  of the written report? Did you communicate your results effectively in written form.  Did you discuss results
+  + (3 pts) Up to 3 points extra credit available for extra effort and very creative solutions 
+
+
+#  Additional Sample Code [REMOVE FROM FINAL NOTEBOOK]
+
+This code provides an example on how to use AUC to calculate training and test set accuracy. Note that AUC using the continuous predictions before they are thresholded to be `1` or `-1`. The famous Titanic dataset is used for this example.
+
+```{r}
+# Prepare Titanic data 
+
+cdata.df <-read.csv("~/MATP-4400/data/titanic3.csv")
+cdata.df <-cdata.df[sample(nrow(cdata.df),400),]
+T.df<-cdata.df[,c("survived","sex","age","parch","fare")]
+
+
+T.df$sex<-as.numeric(as.factor(T.df$sex))
+T.df<-T.df[complete.cases(T.df),]
+survived<-as.factor(T.df$survived)
+
+ 
+```
+
+We add a fake feature to the dataset by making a copy of a feature and randomly permuting it.  That way any relationship with survival is just by chance. 
+
+```{r}
+# Add a "nonsense" feature by permuling the 2 feature
+
+datasize<-nrow(T.df)
+
+myperm<-sample(1:datasize, datasize, replace = FALSE )
+Q<-cbind(T.df[,-1],fake=T.df[myperm,2])
+labels<-as.factor(T.df$survived)
+Q.matrix<-as.matrix(Q)
+```
+
+We split the code into 75% train and 25% split.
+```{r}
+
+#Split the data into training and testing sets
+#ss will be the number of data in the training set
+n <- nrow(Q)
+ss<- ceiling(n*0.75)
+
+train.perm <- sample(1:n,ss)
+
+
+#The first column is just the sample label, we can discard it for statics (This is the -1 in the second position)
+train <- Q[train.perm , ]  #The training data is just the training rows
+test <- Q[-train.perm, ]  # Using -train gives us all rows except the training rows.
+#The last column is the class label, which is 1 or -1, we can split it off as the class
+trainclass <- survived[train.perm]
+testclass <- survived[-train.perm]
+
+rnorm(1)
+```
+
+
+Let's take a look at the features
+```{r}
+boxplot(train, main="Feature Distributions before Normalization")
+rnorm(1)
+```
+
+Looks like we have scaling problems, so let's scale the data.
+Note how the train is scaled first and then the test is scaled using the mean and standard deviation of the test data.
+
+```{r}
+ sc_tr<- scale(train, center = TRUE, scale = TRUE)   # scale Q,
+# scale the test set while we are at it.
+ means <- attr(sc_tr, 'scaled:center') # get the mean of the columns
+ stdevs <- attr(sc_tr, 'scaled:scale') # get the std of the columns
+ sc_test <- scale(test, center=means, scale=stdevs)#scale test using the means and std of tr
+
+ 
+boxplot(sc_tr, main="Feature Distributions after Normalization")
+
+rnorm(1)
+```
+## Fit LDA
+Now we fit an LDA model to the training data.  We look at the training set accuracy by examining the AUC and the balanced accuracy.
+```{r}
+# Fit LDA model
+fit <- lda(sc_tr,trainclass,prior=c(1,1)/2)
+# Predict testing data
+mypredictlda<-predict(fit,sc_test)
+summary(mypredictlda)
+# get ranking of data for use in AUC caluculation.  The raninking is the scalar projections scalar projection of each data point on the weights. It is calculated by lda in the variable x.
+ranking<-as.numeric(mypredictlda$x)
+
+# Compute ROC results
+myroc <-  pROC::roc(testclass,ranking, levels=c('0','1'))
+# compute AUC=Area under ROC curve
+myauc <- pROC::auc(myroc)
+myauc
+
+# Calcuate confusion matrix  to see balanced accuracy. mypredict$class ahs the classes found by LDA.
+confusionMatrix(table(testclass,mypredictlda$class))
+
+rnorm(1)
+```
+
+```{r echo=FALSE}
+# This is hidden code to display the BA and AUC in the text below
+cm <- confusionMatrix(table(testclass,mypredictlda$class))
+myba <- cm$byClass["Balanced Accuracy"]
+
+rnorm(1)
+```
+
+The testing balanced accuracy for LDA is `r myba` and the AUC is `r myauc`.   We leave checking the training accuracy up to you.
+
+Let's take a look at the LDA separating plane weights, to see how the features are used to predict biodegradability.
+```{r}
+fit$scaling
+# get the coefficient for LDA coefficient for fake
+fakecoefflda<-fit$scaling[5]
+
+rnorm(1)
+```
+We can see that the fake feature has a small weight on it, 'r fakecoefflda', even though it is not associated with survival.
+
+## Fit logistic regression model with Lasso
+
+Now we fit the logistic regression model with Lasso
+
+```{r}
+# Fit logistic regression model
+glmnetfit <- glmnet(sc_tr,trainclass,family="binomial",alpha=1,nlambda=100,standardize=FALSE)
+
+# Predict testing data
+#Slambda is the value of lambda that you would like to predict the response
+slambda=.05
+mypredictglmnet<-predict(object=glmnetfit,s=slambda,newx=sc_test)
+summary(mypredictglmnet)
+# get ranking of data for use in AUC caluculation.  The raninking is the scalar projections scalar projection of each data point on the weights. It is calculated by lda in the variable x.
+rankingglmnet<-as.numeric(mypredictglmnet)
+
+# Compute ROC results
+myrocGLMnet <-  pROC::roc(testclass,rankingglmnet, levels=c('0','1'))
+# compute AUC=Area under ROC curve
+myaucGLMnet <- pROC::auc(myrocGLMnet)
+myaucGLMnet
+
+# Calcuate confusion matrix  to see balanced accuracy. mypredict$class ahs the classes found by LDA.
+
+confusionMatrix(data = as.factor(as.integer(rankingglmnet>0.5)), reference = testclass)
+
+rnorm(1)
+```
+
+Now lets look at GLM classification weights for lambda=slambda.
+
+```{r echo=FALSE}
+glmweights<-coef(glmnetfit,s=slambda)
+glmweights
+
+rnorm(1)
+```
+
+Looking at the logistic regression with Lasso with slambda =1 we can see that the model only uses 'sex' and 'age' while maintain AUC of 0.7442 and balanced accuracy of  .7460. Other values of slambda will give different results.
+
+
+## Fit logistic regression model
+
+Now we fit the logistic regression model
+
+```{r}
+
+#make a dataframe with labels since glm likes data frames
+sc_train.df<-as.data.frame(sc_tr)
+my.data<-cbind(trainclass,sc_train.df)
+
+# Fit logistic regression model using glm
+# Formula uses all of the features
+glmfit <- glm(trainclass~.,data=my.data,family="binomial")
+summary(glmfit)
+# Predict testing data
+mypredictlr<-predict(glmfit,as.data.frame(sc_test),type="response")
+
+# Compute ROC results
+myrocLR <-  pROC::roc(testclass,mypredictlr, levels=c('0','1'))
+# compute AUC=Area under ROC curve
+myaucLR <- pROC::auc(myrocLR)
+myaucLR
+
+# Calcuate confusion matrix  to see balanced accuracy
+# This shows how to call it without using table first.
+# Note we have to threhold mypredictlr to get classes.
+confusionMatrix(data = as.factor(as.integer(mypredictlr>0.5)), reference = testclass)
+
+rnorm(1)
+```
+
+```{r echo=FALSE}
+# This is hidden code to display the BA and AUC in the text below
+cmLR <- confusionMatrix(data = as.factor(as.integer(mypredictlr>0.5)), reference = testclass)
+mybaLR <- cmLR$byClass["Balanced Accuracy"]
+
+rnorm(1)
+```
+
+
+Now lets look at the GLM weights.
+
+```{r}
+glmfit$coefficients
+# get the coefficient for LDA coefficient for fake
+fakecoeffglm<-glmfit$coefficients["fake"]
+
+rnorm(1)
+```
+From the output of `glm`, we can see that `fake` has a coefficient of `r fakecoeffglm`, but the p-value indicates that this feature is insignificant and could be removed.
+
+The training balanced accuracy of logistic regression is `r mybaLR` and the AUC is `r myaucLR`.  The logistic regression and LDA models have very similar performance. Of course the testing set accuracy is what really matters.
+
+```{r}
+# Plot ROC curves
+
+ggroc(list(LDA = myroc, LR = myrocLR, LASSO=myrocGLMnet)) +
+  labs(color = "Method") +
+  ggtitle("Comparison of test accurcy on Chems-R-Us data")
+
+rnorm(1)
+```
+
+**Sensitivity** (also called the *true positive rate* or the *recall*) measures the proportion of actual positives that are correctly identified as such (e.g., the percentage of passengers that survived eople who are correctly identified as having survived).
+
+**Specificity** (also called the *true negative rate*) measures the proportion of actual negatives that are correctly identified as such (e.g., the percentage of patients who died who are correctly identified as not having died).
+
+The ROC curves for LDA, GLMNET, and LR confirm that they have very similar performance since there are no large differences.
+
+
